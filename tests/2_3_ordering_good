@@ -1,0 +1,2 @@
+echo "a"; sleep 1; echo "b"; sleep 1; echo "c"
+sleep 0.5; echo "1"; sleep 1; echo "2"; false; sleep 1; echo "never!"

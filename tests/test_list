@@ -1,0 +1,77 @@
+max_cpu=10
+pre_compile_command = 'tar xvf crate.tar >/dev/null'
+files = ['crate.tar']
+compile_commands = ['./build_mark_wrapper.sh', '6991 cargo build --target-dir target #']
+command = "./target/debug/rslogo"
+max_stdout_bytes=50000
+
+# 0_0_simple
+<tests/0_0_simple ./target/debug/pars -J 1
+# 0_1_simple_different
+<tests/0_1_simple_different ./target/debug/pars -J 1
+# 0_2_many_commands
+<tests/0_2_many_commands ./target/debug/pars -J 1
+# 1_0_multiple_commands
+<tests/1_0_multiple_commands ./target/debug/pars -J 1
+# 1_1_quoting
+<tests/1_1_quoting ./target/debug/pars -J 1
+# 1_2_sleepy
+<tests/1_2_sleepy ./target/debug/pars -J 1
+# 1_3_halting_problems
+<tests/1_3_halting_problems ./target/debug/pars -J 1
+# 2_0_multiple_commands_2_threads
+<tests/2_0_multiple_commands_2_threads ./target/debug/pars -J 2
+# 2_1_multiple_commands_4_threads
+<tests/2_1_multiple_commands_4_threads ./target/debug/pars -J 4
+# 2_2_multiple_commands_errors_4_threads
+<tests/2_2_multiple_commands_errors_4_threads ./target/debug/pars -J 4
+# 2_3_ordering_good
+<tests/2_3_ordering_good ./target/debug/pars -J 2
+# 3_1_halt_lazy_2_threads
+<tests/3_1_halt_lazy_2_threads ./target/debug/pars -J 2 --halt lazy
+# 3_2_halt_eager_2_threads
+<tests/3_2_halt_eager_2_threads ./target/debug/pars -J 2 --halt eager
+# 3_3_halt_eager_3_threads
+<tests/3_3_halt_eager_3_threads ./target/debug/pars -J 3 --halt eager
+# 4_0_0_simple_remote
+<tests/0_0_simple ./target/debug/pars -r localhost:$PORT/1
+# 4_0_1_simple_different_remote
+<tests/0_1_simple_different ./target/debug/pars -r localhost:$PORT/1
+# 4_0_2_many_commands_remote
+<tests/0_2_many_commands ./target/debug/pars -r localhost:$PORT/1
+# 4_1_0_multiple_commands_remote
+<tests/1_0_multiple_commands ./target/debug/pars -r localhost:$PORT/1
+# 4_1_1_quoting_commands_remote
+<tests/1_1_quoting ./target/debug/pars -r localhost:$PORT/1
+# 4_1_2_sleepy_remote
+<tests/1_2_sleepy ./target/debug/pars -r localhost:$PORT/1
+# 4_1_3_halting_problems_remote
+<tests/1_3_halting_problems ./target/debug/pars -r localhost:$PORT/1
+# 5_2_0_multiple_commands_2_threads_remote
+<tests/2_0_multiple_commands_2_threads ./target/debug/pars -r localhost:$PORT/2
+# 5_2_1_multiple_commands_4_threads_remote
+<tests/2_1_multiple_commands_4_threads ./target/debug/pars -r localhost:$PORT/4
+# 5_2_2_multiple_commands_errors_4_threads_remote
+<tests/2_2_multiple_commands_errors_4_threads ./target/debug/pars -r localhost:$PORT/4
+# 5_2_3_ordering_good_remote
+<tests/2_3_ordering_good ./target/debug/pars -r localhost:$PORT/4
+# 5_3_1_halt_lazy_2_threads_remote
+<tests/3_1_halt_lazy_2_threads ./target/debug/pars -r localhost:$PORT/2 --halt lazy
+# 5_3_2_halt_eager_2_threads_remote
+<tests/3_2_halt_eager_2_threads ./target/debug/pars -r localhost:$PORT/2 --halt eager
+# 5_3_3_halt_eager_3_threads_remote
+<tests/3_3_halt_eager_3_threads ./target/debug/pars -r localhost:$PORT/3 --halt eager
+# 6_2_0_multiple_commands_2_threads
+<tests/2_0_multiple_commands_2_threads ./target/debug/pars -r localhost:$PORT/1 -r localhost:$PORT/1
+# 6_2_1_multiple_commands_4_threads
+<tests/2_1_multiple_commands_4_threads ./target/debug/pars -r localhost:$PORT/2 -r localhost:$PORT/2
+# 6_2_2_multiple_commands_errors_4_threads
+<tests/2_2_multiple_commands_errors_4_threads ./target/debug/pars -r localhost:$PORT/2 -r localhost:$PORT/2
+# 6_2_3_ordering_good
+<tests/2_3_ordering_good ./target/debug/pars -r localhost:$PORT/2 -r localhost:$PORT/2
+# 6_3_1_halt_lazy_2_threads
+<tests/3_1_halt_lazy_2_threads ./target/debug/pars -r localhost:$PORT/1 -r localhost:$PORT/1 --halt lazy
+# 6_3_2_halt_eager_2_threads
+<tests/3_2_halt_eager_2_threads ./target/debug/pars -r localhost:$PORT/1 -r localhost:$PORT/1 --halt eager
+# 6_3_3_halt_eager_3_threads
+<tests/3_3_halt_eager_3_threads ./target/debug/pars -r localhost:$PORT/1 -r localhost:$PORT/2 --halt eager

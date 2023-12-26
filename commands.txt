@@ -1,0 +1,7 @@
+sleep 1; echo "hello"
+sleep 2; echo "world"
+sleep 3; echo "I'm"
+sleep 4; echo "Tom"
+sleep 4; echo "Tom"
+sleep 4; echo "Tom"
+sleep 4; echo "Tom"

@@ -1,0 +1,118 @@
+# Pars Mark Request
+
+## Which stages are complete?
+
+Please mark stages that are complete with an [X].
+Stages that are partially complete should be marked with a [?].
+Stages that are not complete should be left blank (like [ ]).
+
+> [X] Single Command (local)
+> [X] Multiple Commands (local)
+> [X] Halting Modes (local)
+> [ ] Run commands remotely (one machine)
+> [ ] Run commands on one machine using only one connection per machine
+> [ ] Run commands over multiple machines
+
+## Design Excellence / Extension
+
+If you have completed a "design excellence" task, please write what
+the task was below (note, it MUST be on the list in the assignment or
+approved by COMP6991 staff).
+
+> everything in tokio async, never again oml
+> i think i also don't use blocking calls? since everything is async, i don't really busy wait or poll if i understand tokio correctly
+> but please correct me if im wrong
+
+
+## Design Limitations
+
+If you made any design decisions which you now regret making; but don't to go back and change them,
+let us know here. You can make up your design marks by acknowledging up to 5 things you would do
+differently now.
+
+0. 
+> i went through many iterations, experimenting with different types of spawns in tokio, before settling with the standard
+> the blocking_spawn was working but it was very inconsistent, the threads spawned seemed to be all entirely async
+> and the instant it blocks it just runs off to another thread, for example when calling sleep. the only work around was limiting
+> the runtime in main so that the blocking_spawns were limited by the worker count. I think I would have liked more time to try 
+> to get blockign_spawns working, since its more like async behavior. with 1 worker thread, I could have parsed 10 lines near instantly
+> if they had sleep since i could swap between the threads. but that wasn't really the assignment
+
+1.
+> I regret not doing something with broadcast before settling with spawns as i think letting MSPC decide what worker to spawn is better
+> if i had a main spawn x workers, and when the workers die, they write their output. Main reads channel and spawns a new thread for each 
+> dead worker, until work is done. This way seems alot better than using semaphores to manually allow permits and whatnot. 
+
+2.
+> Another regret is using a mutex instead of the rwlock on accessing and checking if exitstatus non zero has triggered somewhere. 
+> I tried to make it work originally but having one thread read while another was writing, and the followed by another read was blockign a bit
+> I wish i had more time to mess with it since that would vastly improve performance
+
+3.
+> yeah idk why i'm passing a hashmap around like its nothing even if its in arc it seems a bit lmao, i should have just moved all the information
+> into a struct instead of keeping a fat hashmap around, also should probably do error checking on stdin before spawning not other way around
+> right now ij ust yeet it at command and see what it does before printing. also maybe my handling of invalid commands isnt the best shoud probably return a message
+
+4. 
+> i regret using manual error casting with from traits, instead of just boxing my errors like i did in the last assignment,
+> it made the process of bubbling up errors alot more annoying as well. Alot of the errors are actually the same and I could have 
+> spent more time exploring part 2 if i didn't spend so long fiugring out why my future errors werent casting properly bc of some missing
+> residual trait or what not, couldn't even get it to work in the end
+
+
+
+
+
+## Other Comments
+
+If you want to let us know something else about your program, put it here!
+(Feel free to leave this blank)
+
+took an entire day to debug this :() its fixed now can redirect from file, don't really know why but it works
+
+    ```
+    echo "2_0_multiple_commands_2_threads"
+    6991 pars -J 2 < ~cs6991/assign02_test_files/2_0_multiple_commands_2_threads > outputref.txt
+    <tests/2_0_multiple_commands_2_threads ./target/debug/pars -J 2 > outputme.txt
+    diff outputref.txt outputme.txt
+    ```
+
+    > with this script it prints hello I'm world Tom, instead of hellow world I'm Tom 
+    > however running the actual target_debug and copy pasting in the commands the correct order is formed hello world I'm Tom.
+    > 
+    > each thread line gets read -> gets spawned *4 
+    > they all in the pool scheduler randomly picks ?
+    > below is the only thing I changed and suddenly  its working now?
+    > for some reason when it was the first version, the dispatch does all the rec_dispatch instantly instead of yielding 
+    > was but outside now in the working version it yields for some reason so I guess is scheduling magic?
+
+    ```
+    ERROR VERSION
+    let rec_dispatch = task::spawn(async move {
+        loop {
+            if let Some(line) = trx.recv().await {
+                let guard = Arc::clone(&guard);
+                let args = Arc::clone(&args);
+                let tx = tx.clone();
+                println!("rec_dispatch: {}", line);
+                task::spawn(async move {
+                    println!("spawned: {}", line);
+                    proc_line(line, args, guard, tx);
+                });
+            } 
+        }
+     
+    });
+
+    Working version
+    while let Some(line) = trx.recv().await {
+        let guard = Arc::clone(&guard);
+        let args = Arc::clone(&args);
+        let tx = tx.clone();
+        println!("rec_dispatch: {}", line);
+        task::spawn( async move {
+            println!("spawned: {}", line);
+            proc_line(line, args, guard, tx);
+        });
+    } 
+    ```
